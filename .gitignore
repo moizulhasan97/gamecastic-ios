@@ -1,0 +1,146 @@
+# ============================================================
+# Xcode
+# ============================================================
+
+# User-specific files
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+*.xcscmblueprint
+
+# Workspace user data
+xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Xcode caches
+DerivedData/
+.build/
+
+# Build products
+build/
+Build/
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# Uncomment the next line if this is an APPLICATION project.
+# Leave it tracked if this is a Swift Package.
+# Package.resolved
+
+# ============================================================
+# Archives & Debug
+# ============================================================
+
+*.ipa
+*.dSYM
+*.dSYM.zip
+*.bcsymbolmap
+
+# Crash logs
+*.crash
+
+# ============================================================
+# CocoaPods (only if using CocoaPods)
+# ============================================================
+
+Pods/
+
+# Uncomment if you don't want to commit the workspace.
+# Usually keep the workspace committed when using CocoaPods.
+# *.xcworkspace
+
+# ============================================================
+# Carthage (only if using Carthage)
+# ============================================================
+
+Carthage/Build/
+
+# ============================================================
+# Fastlane
+# ============================================================
+
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# ============================================================
+# Secrets & Local Configuration
+# ============================================================
+
+.env
+.env.*
+*.env
+
+Secrets.plist
+Secrets.xcconfig
+Config.local.xcconfig
+
+# API Keys
+GoogleService-Info.plist
+firebase.json
+
+# ============================================================
+# macOS
+# ============================================================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ============================================================
+# Editor Files
+# ============================================================
+
+.vscode/
+.idea/
+
+*.swp
+*.swo
+*~
+
+# ============================================================
+# Cursor AI
+# ============================================================
+
+.cursor/
+
+# ============================================================
+# Claude Code
+# ============================================================
+
+.claude/
+
+# ============================================================
+# Gemini CLI (if used)
+# ============================================================
+
+.gemini/
+
+# ============================================================
+# Continue.dev
+# ============================================================
+
+.continue/
+
+# ============================================================
+# Aider
+# ============================================================
+
+.aider*
+
+# ============================================================
+# Local MCP configuration
+# ============================================================
+
+.mcp/
+.mcp.json
+
+# ============================================================
+# Temporary files
+# ============================================================
+
+tmp/
+temp/
+*.tmp
