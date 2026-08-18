@@ -144,3 +144,5 @@ firebase.json
 tmp/
 temp/
 *.tmp
+
+/guided-hunters
