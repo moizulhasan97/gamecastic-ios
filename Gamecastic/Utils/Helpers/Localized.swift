@@ -38,7 +38,12 @@ struct Localized: ExpressibleByStringLiteral {
         self.comment = comment
     }
     
-    func resolve(_ args: CVarArg...) -> String {
+    /// The array overload is the real implementation. It exists because callers
+    /// that already hold `[CVarArg]` — `Text.init(_:_:)` in `Text+Extension` — would
+    /// otherwise pass the array *as a single argument* to the variadic form, and
+    /// `String(format:arguments:)` would receive `[[CVarArg]]` and substitute
+    /// nothing. Both spellings now land here.
+    func resolve(_ args: [CVarArg]) -> String {
         let lookedUp = NSLocalizedString(
             key, tableName: table, bundle: .main,
             value: LocalizedLookupConstants.missingKeySentinel, comment: comment
@@ -51,6 +56,10 @@ struct Localized: ExpressibleByStringLiteral {
             base = lookedUp
         }
         return args.isEmpty ? base : String(format: base, arguments: args)
+    }
+    
+    func resolve(_ args: CVarArg...) -> String {
+        resolve(args)
     }
     
     func callAsFunction(_ args: CVarArg...) -> String {

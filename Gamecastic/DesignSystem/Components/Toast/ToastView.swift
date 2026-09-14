@@ -14,7 +14,7 @@ struct ToastView: View {
     
     var body: some View {
         Text(text)
-            .font(FontProvider.getFont(name: FontProvider.inter(weight: .medium).fontName, size: 14)) // TODO: Replace font with typography
+            .typography { $0.labelMedium }
             .foregroundColor(theme.currentTheme.snow)
             .lineLimit(2)
             .multilineTextAlignment(.center)

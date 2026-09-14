@@ -43,6 +43,15 @@ enum AppLogger {
         warning("[Localization] Missing key '\(key)' (table: \(table ?? "Localizable")); using default: \"\(defaultUsed)\"", file: file, line: line)
     }
     
+    static func fontsUnavailable(names: [String], registered: [String], file: String = #fileID, line: Int = #line) {
+        warning(
+            "[Fonts] Not registered: \(names.joined(separator: ", ")). "
+            + "Font.custom() will silently fall back to the system font. "
+            + "PostScript names actually available: \(registered.joined(separator: ", "))",
+            file: file, line: line
+        )
+    }
+    
     private static func log(_ level: LogLevel, _ message: String, file: String, line: Int) {
         guard level >= minimumLogLevel else { return }
         logger.log(level: level.osLogType, "[\(file):\(line)] \(message)")
