@@ -54,7 +54,7 @@ nonisolated struct AuthTokens: Sendable, Equatable {
 /// identity server speaks OAuth, not the app's `{success,message,data,error}` envelope.
 nonisolated enum AuthError: Error, Sendable, Equatable {
     /// The mobile OAuth client / redirect scheme isn't registered with the
-    /// backend yet, so we can't even start the flow. (See `OIDCConfig` TODOs.)
+    /// backend yet, so we can't even start the flow.
     case notConfigured
     /// The user closed the login sheet before finishing.
     case cancelled

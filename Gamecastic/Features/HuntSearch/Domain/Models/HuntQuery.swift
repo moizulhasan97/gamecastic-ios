@@ -34,14 +34,13 @@ nonisolated struct HuntQuery: Sendable, Equatable {
     var searchText: String? = nil
     
     /// Coarse location scope (`state=` param, 2-letter code). `nil` returns all
-    /// states. TODO: set this from the location picker once "WHERE" exists on mobile.
+    /// states.
     var state: String? = nil
     
     /// 1-based page index.
     var page: Int = 1
     
-    /// Page size. TODO(pagination): a single page is fetched today; wire real
-    /// paging (append on scroll) using the `total` / `pages` in `HuntSearchPage`.
+    /// Page size.
     var limit: Int = 20
     
     /// The ordered query items for this request, ready for `Endpoint(queryItems:)`.

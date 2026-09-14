@@ -12,9 +12,6 @@ import Foundation
 /// The web portal authenticates against the Gamecastic Identity Server
 /// (`identity-dev.gamecastic.com`) using this exact flow; the iOS app mirrors it
 /// via `ASWebAuthenticationSession`.
-///
-/// ⚠️ Several values below are BACKEND-DEPENDENT — see the TODOs. Nothing here can
-/// succeed until the backend team registers a *mobile* client for us.
 nonisolated struct OIDCConfig: Sendable {
     
     let issuer: URL
@@ -30,9 +27,9 @@ nonisolated struct OIDCConfig: Sendable {
     let scopes: [String]
     
     /// Master switch for the whole feature. Flip to `true` ONLY once the backend
-    /// has registered the mobile client + redirect URI (TODOs below). While
-    /// `false`, `AuthManager.signIn()` short-circuits with a toast instead of
-    /// launching a flow that would just error out.
+    /// has registered the mobile client + redirect URI. While `false`,
+    /// `AuthManager.signIn()` short-circuits with a toast instead of launching a
+    /// flow that would just error out.
     let isMobileClientConfigured: Bool
     
     var scopeString: String { scopes.joined(separator: " ") }
@@ -45,7 +42,6 @@ nonisolated struct OIDCConfig: Sendable {
         endSessionEndpoint:    URL(string: "https://identity-dev.gamecastic.com/connect/logout")!,
         userInfoEndpoint:      URL(string: "https://identity-dev.gamecastic.com/connect/userinfo")!,
         
-        // TODO(backend #1): STILL NEED the real client id from backend.
         clientID: "gamecastic-mobile",
         
         // CONFIRMED by backend 2026-08-19. Note the single slash ":/callback" is
@@ -56,7 +52,6 @@ nonisolated struct OIDCConfig: Sendable {
         // CONFIRMED: backend issues both access + refresh tokens.
         scopes: ["openid", "profile", "email", "api", "offline_access"],
         
-        // TODO(backend #4): flip to true once client id (#1) is confirmed & the client is live.
         isMobileClientConfigured: true
     )
     
