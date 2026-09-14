@@ -144,5 +144,10 @@ firebase.json
 tmp/
 temp/
 *.tmp
-
 /guided-hunters
+
+# ============================================================
+# Claude working directory (design artefacts, staged config)
+# ============================================================
+
+/Claude outputs/
