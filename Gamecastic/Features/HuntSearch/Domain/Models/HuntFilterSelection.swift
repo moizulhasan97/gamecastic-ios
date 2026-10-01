@@ -96,7 +96,7 @@ nonisolated enum HuntFacetQueryKey {
         switch sectionID {
         case "species":   return "species"
         case "region":    return "regions"
-        case "outfitter": return "outfitters"
+        case "outfitter": return "outfitterIds"
         case "schedule":  return "schedules"
         case "duration":  return "durations"
         case "lodging":   return "lodging"
