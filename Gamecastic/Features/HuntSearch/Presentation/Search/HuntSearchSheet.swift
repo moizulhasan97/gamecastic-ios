@@ -49,7 +49,10 @@ struct HuntSearchSheet: View {
             footer
         }
         .background(theme.currentTheme.paper.ignoresSafeArea())
-        .task { viewModel.onAppear() }
+        .task {
+            viewModel.onAppear()
+            await viewModel.loadRegions()
+        }
     }
     
     // MARK: - Header

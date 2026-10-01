@@ -20,25 +20,46 @@ final class HuntSearchSheetViewModel: ObservableObject {
     
     /// Working copy. Bound directly by the sheet (region taps + the search field).
     @Published var criteria: HuntSearchCriteria
-    /// The WHERE options.
+    /// The WHERE options: "All of Texas" plus one option per `region` facet.
     @Published private(set) var regions: [TXRegion]
     /// Live match count for the working criteria. `nil` while (re)counting.
     @Published private(set) var matchCount: Int?
     
     private let repository: HuntSearchRepository
+    private let regionProvider: HuntRegionProvider
     private var countTask: Task<Void, Never>?
     
     init(
         repository: HuntSearchRepository,
-        regionProvider: HuntRegionProvider = DefaultHuntRegionProvider(),
+        regionProvider: HuntRegionProvider = FacetHuntRegionProvider(),
         initialCriteria: HuntSearchCriteria
     ) {
         self.repository = repository
-        self.regions = regionProvider.regions()
+        self.regionProvider = regionProvider
+        // Until facets arrive: "All of Texas" plus whatever is already applied,
+        // so an applied region is never missing from the picker.
+        self.regions = HuntSearchSheetViewModel.merging([.all], keeping: initialCriteria.region)
         self.criteria = initialCriteria
     }
     
     func onAppear() { refreshCount() }
+    
+    /// Loads the WHERE options from `GET /hunts/facets`. On failure the
+    /// placeholder options stay, so the sheet still works with "All of Texas".
+    func loadRegions() async {
+        do {
+            let facets = try await repository.loadFacets()
+            regions = Self.merging(regionProvider.regions(from: facets), keeping: criteria.region)
+        } catch {
+            if Task.isCancelled || error is CancellationError { return }
+            AppLogger.warning("Search regions failed: \(error)")
+        }
+    }
+    
+    /// `options`, plus `selected` appended when the server no longer lists it.
+    private static func merging(_ options: [TXRegion], keeping selected: TXRegion) -> [TXRegion] {
+        options.contains(selected) ? options : options + [selected]
+    }
     
     var canReset: Bool {
         criteria.region != .all ||

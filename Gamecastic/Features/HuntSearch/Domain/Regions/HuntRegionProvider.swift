@@ -7,28 +7,23 @@
 
 import Foundation
 
-/// A named, user-selectable location for the search bar's WHERE segment.
+/// A user-selectable location for the search bar's WHERE segment.
 ///
-/// Gamecastic is Texas-only today, and the web labels WHERE with *regions*
-/// ("Hill Country") rather than the city-level values the `/hunts` `regions`
-/// facet exposes (`Amarillo|TX`). So a region is modelled as a curated grouping
-/// that declares *how it contributes to a query*:
+/// Options come from the `region` section of `GET /hunts/facets`, the same
+/// source the Android app uses, so the picker only offers places that have
+/// inventory. Each option declares how it contributes to a query:
 ///
-/// - `stateCode` scopes the coarse `state=` param (all TX regions → `TX`).
-/// - `facetRegionIDs` — when known — are the exact `regions=City|ST` values that
-///   make up this grouping, sent as repeated params for precise filtering.
+/// - `stateCode` scopes the coarse `state=` param.
+/// - `facetRegionIDs` are the exact `regions=City|ST` tokens, sent as repeated
+///   params. When present they replace `state=` (see `HuntSearchCriteria`).
 ///
-/// Today `facetRegionIDs` is empty for every grouping (we don't yet have the
-/// city→region map from backend), so WHERE currently scopes to `state=TX`. The
-/// moment backend provides a region grouping (or we hardcode city lists), fill
-/// `facetRegionIDs` here and querying becomes precise — no other layer changes.
-/// TODO(backend): add a region-group concept (or per-city region tags) to facets.
+/// `.all` is the only client-side option.
 nonisolated struct TXRegion: Sendable, Equatable, Identifiable, Hashable {
     let id: String
     let label: String
     /// Coarse `state=` scope. `nil` = all states.
     let stateCode: String?
-    /// Precise `regions=` facet values (`City|ST`) this grouping maps to.
+    /// Precise `regions=` facet values (`City|ST`) this option maps to.
     /// Empty → fall back to `stateCode` scoping only.
     let facetRegionIDs: [String]
     
@@ -39,29 +34,40 @@ nonisolated struct TXRegion: Sendable, Equatable, Identifiable, Hashable {
         self.facetRegionIDs = facetRegionIDs
     }
     
+    /// Builds an option from one `region` facet option. `option.id` is the exact
+    /// `regions=` token (`Amarillo|TX`); the part after `|` is the state code.
+    init(facetOption option: FacetOption) {
+        let parts = option.id.split(separator: "|", omittingEmptySubsequences: false)
+        let state = parts.count == 2
+            ? parts[1].trimmingCharacters(in: .whitespaces)
+            : ""
+        self.init(
+            id: option.id,
+            label: option.label,
+            stateCode: state.isEmpty ? nil : state,
+            facetRegionIDs: [option.id]
+        )
+    }
+    
     /// The default "anywhere in Texas" scope — the starting WHERE value.
     static let all = TXRegion(id: "all", label: "All of Texas", stateCode: "TX")
 }
 
-/// Supplies the curated WHERE options. Protocol-first so a facets/backend-driven
-/// implementation can replace the hardcoded list later without touching callers —
-/// the same pattern as `HuntFilterFactory`.
+/// Supplies the WHERE options shown in the search sheet.
 protocol HuntRegionProvider: Sendable {
-    func regions() -> [TXRegion]
+    /// WHERE options for a facets taxonomy. Always starts with `.all`.
+    func regions(from facets: [FacetSection]) -> [TXRegion]
 }
 
-/// Hardcoded Texas regions. Edit this one array to add/reorder WHERE options.
-/// `facetRegionIDs` are intentionally empty until the city→region map is known.
-nonisolated struct DefaultHuntRegionProvider: HuntRegionProvider {
-    func regions() -> [TXRegion] {
-        [
-            .all,
-            TXRegion(id: "hill-country",   label: "Hill Country"),
-            TXRegion(id: "south-texas",    label: "South Texas"),
-            TXRegion(id: "panhandle",      label: "Panhandle"),
-            TXRegion(id: "piney-woods",    label: "Piney Woods"),
-            TXRegion(id: "gulf-coast",     label: "Gulf Coast"),
-            TXRegion(id: "west-texas",     label: "West Texas"),
-        ]
+/// Builds WHERE options from the `region` facet section, in the server's order.
+nonisolated struct FacetHuntRegionProvider: HuntRegionProvider {
+    /// The facets section that carries `City|ST` tokens.
+    static let sectionID = "region"
+    
+    func regions(from facets: [FacetSection]) -> [TXRegion] {
+        guard let section = facets.first(where: { $0.id == Self.sectionID }) else {
+            return [.all]
+        }
+        return [.all] + section.options.map(TXRegion.init(facetOption:))
     }
 }
